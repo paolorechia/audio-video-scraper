@@ -1,5 +1,6 @@
 version: '3'
-  services:
+services:
   redis:
-    - ports: "6379:6379"
-    image: redis-alpine
+    image: redis:5.0.5-alpine
+    ports: 
+      - "6666:6379"
