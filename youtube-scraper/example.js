@@ -12,6 +12,12 @@ const puppeteer = require('puppeteer');
   await searchButton.click()
   await page.waitForNavigation({ waitUntil: 'networkidle2' }),
   await page.screenshot({path: 'search_click.png'});
+  const videoHrefs = await page.evaluate(() => {
+    const anchors = document.querySelectorAll('a.ytd-video-renderer');
+    return [].map.call(anchors, a => a.href);
+  });
+  console.log(videoHrefs);
+
 
   await browser.close();
 })();
