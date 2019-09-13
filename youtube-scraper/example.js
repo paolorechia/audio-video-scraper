@@ -4,7 +4,11 @@ const puppeteer = require('puppeteer');
   show=false;
   let browser;
   if (show === false) {
-    browser = await puppeteer.launch();
+    browser = await puppeteer.launch({
+      height: 1080,
+      width: 800
+
+    });
   } else {
     browser = await puppeteer.launch({
       headless: false,
@@ -54,13 +58,26 @@ const puppeteer = require('puppeteer');
   await page.screenshot({ path: 'filter_click3.png'});
   await filterButton.click()
   await page.waitFor(1000)
-  await page.screenshot({ path: 'last_screen.png'});
+  await page.screenshot({ path: 'filtered_screen.png'});
   const videoHrefs = await page.evaluate(() => {
     const anchors = document.querySelectorAll('a.ytd-video-renderer');
     return [].map.call(anchors, a => a.href);
   });
-  console.log(videoHrefs);
-
-
+  console.log(videoHrefs)
+  await scrollDown(page);
+  await page.waitFor(1500)
+  await page.screenshot({ path: 'scrolled_down.png'});
+  const videoHrefs2 = await page.evaluate(() => {
+    const anchors = document.querySelectorAll('a.ytd-video-renderer');
+    return [].map.call(anchors, a => a.href);
+  });
+  console.log(videoHrefs2)
   await browser.close();
 })();
+
+
+async function scrollDown(page) {
+    await page.evaluate(async () => {
+      window.scrollBy(0, 129301290);
+    });
+}
