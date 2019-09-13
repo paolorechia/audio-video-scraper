@@ -1,17 +1,60 @@
 const puppeteer = require('puppeteer');
 
 (async () => {
-  const browser = await puppeteer.launch();
+  show=false;
+  let browser;
+  if (show === false) {
+    browser = await puppeteer.launch();
+  } else {
+    browser = await puppeteer.launch({
+      headless: false,
+      slowMo: 30 // slow down by 250ms
+    });
+  }
   const page = await browser.newPage();
   html = await page.goto('https://youtube.com');
   const searchBar = await page.$('#search');
   await searchBar.click()
   await page.keyboard.type('finanças');
-  await page.screenshot({path: 'youtube_fin.png'});
+  await page.screenshot({path: 'youtube_search_fin.png'});
   const searchButton = await page.$('#search-icon-legacy')
   await searchButton.click()
   await page.waitForNavigation({ waitUntil: 'networkidle2' }),
-  await page.screenshot({path: 'search_click.png'});
+  await page.screenshot({path: 'sclick.png'});
+  const filterButton = await page.$('#button.ytd-toggle-button-renderer');
+  await filterButton.click()
+  await page.screenshot({ path: 'filter_click.png'});
+
+  const creativeCommonsFilter = await page.evaluate(() => {
+    const filters =
+      document.querySelectorAll('yt-formatted-string.ytd-search-filter-renderer')
+      return [].map.call(filters, async t => { 
+        if (t.innerHTML === 'Creative Commons') {
+          await t.click()
+          return t.innerHTML;
+          }
+      });
+  });
+  await page.waitFor(1000)
+  await filterButton.click()
+  await page.screenshot({ path: 'filter_click2.png'});
+  const SubtitlesCCFilter = await page.evaluate(() => {
+    const filters =
+      document.querySelectorAll('yt-formatted-string.ytd-search-filter-renderer')
+      return [].map.call(filters, async t => { 
+        if (t.innerHTML === 'Legendas/CC') {
+          await t.click()
+          return t.innerHTML;
+          }
+      });
+  });
+  await page.waitFor(1000)
+  await filterButton.click()
+  await page.waitFor(1000)
+  await page.screenshot({ path: 'filter_click3.png'});
+  await filterButton.click()
+  await page.waitFor(1000)
+  await page.screenshot({ path: 'last_screen.png'});
   const videoHrefs = await page.evaluate(() => {
     const anchors = document.querySelectorAll('a.ytd-video-renderer');
     return [].map.call(anchors, a => a.href);
